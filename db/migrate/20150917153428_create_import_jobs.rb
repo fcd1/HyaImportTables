@@ -5,7 +5,7 @@ class CreateImportJobs < ActiveRecord::Migration
     create_table :import_jobs do |t|
 
       t.string :name, null: false
-      t.references :user, index: true
+      t.references :user, null: false, index: true
 
       t.timestamps null: false
 
