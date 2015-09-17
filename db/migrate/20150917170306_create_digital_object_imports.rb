@@ -12,8 +12,6 @@ class CreateDigitalObjectImports < ActiveRecord::Migration
 
     end
 
-    add_foreign_key :digital_object_imports, :import_jobs
-
   end
 
 end
