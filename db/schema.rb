@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150917174850) do
+ActiveRecord::Schema.define(version: 20150917193355) do
 
   create_table "digital_object_imports", force: :cascade do |t|
     t.text     "digital_object_data", limit: 65535
@@ -33,7 +33,7 @@ ActiveRecord::Schema.define(version: 20150917174850) do
   add_index "import_jobs", ["user_id"], name: "index_import_jobs_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string "name", limit: 255
+    t.string "name", limit: 255, null: false
   end
 
 end
