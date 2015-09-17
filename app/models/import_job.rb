@@ -1,6 +1,6 @@
 class ImportJob < ActiveRecord::Base
 
-  validates :name, presence: true, uniqueness: true
+  validates :name, presence: true
   has_many :digital_object_import, dependent: :destroy
 
   def success?
