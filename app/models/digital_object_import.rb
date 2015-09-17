@@ -1,0 +1,17 @@
+class DigitalObjectImport < ActiveRecord::Base
+
+  enum status: {pending: 0, success: 1, failure: 2}
+  after_initialize :default_values
+  belongs_to :import_job
+  validates :import_job, presence: true
+
+  private
+
+  def default_values
+
+    pending! unless (success? || failure?)
+    # failure! unless (success? || pending?)
+
+  end
+
+end
