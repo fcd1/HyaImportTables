@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe ImportJob, :type => :model do
 
+  let(:test_id) { i = 31415926535 }
+
   before(:context) do
 
     # ImportJob.destroy_all
@@ -17,7 +19,8 @@ RSpec.describe ImportJob, :type => :model do
 
     it "instance is invalid if required name arg is not given" do
 
-      new_import_job = ImportJob.new
+      new_user = User.new(id: test_id)
+      new_import_job = ImportJob.new(id: test_id, User: new_user)
       expect(new_import_job.valid?).to eq(false)
 
     end
