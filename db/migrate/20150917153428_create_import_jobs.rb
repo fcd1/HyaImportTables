@@ -11,8 +11,6 @@ class CreateImportJobs < ActiveRecord::Migration
 
     end
 
-    add_foreign_key :import_jobs, :users
-
   end
 
 end
