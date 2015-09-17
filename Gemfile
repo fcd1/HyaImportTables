@@ -43,5 +43,9 @@ group :development, :test do
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+
+  # fcd1, 09/17/15: added rspec-rails gem
+  gem 'rspec-rails'
+
 end
 
