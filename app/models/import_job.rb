@@ -10,7 +10,7 @@ class ImportJob < ActiveRecord::Base
     
     DigitalObjectImport.where(import_job: self).each do |import|
 
-      puts 'Here is the DigitalObjectImport inside the where:' +  import.inspect
+      # puts 'Here is the DigitalObjectImport inside the where:' +  import.inspect
       return false if (import.pending? || import.failure?)
 
     end

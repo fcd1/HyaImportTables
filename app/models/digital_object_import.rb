@@ -10,7 +10,6 @@ class DigitalObjectImport < ActiveRecord::Base
   def default_values
 
     pending! unless (success? || failure?)
-    # failure! unless (success? || pending?)
 
   end
 
