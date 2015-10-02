@@ -2,192 +2,163 @@ require 'rails_helper'
 
 RSpec.describe ImportJob, :type => :model do
 
-  # let(:test_id) { i = 31415926535 }
   let(:test_id) { i = 77 }
   let(:test_id_2) { i = 78 }
 
   before(:context) do
 
-    # ImportJob.destroy_all
-    # puts ImportJob.all
-    # new_import_job = ImportJob.new(name: 'Fred')
-    # new_import_job2 = ImportJob.new(name: 'Fred')
-    # puts ImportJob.all
-    # @test_user = User.new(id: 77, name: "Test User")
-    # @test_import_job = ImportJob.new(id: 77, name: 'All Jobs Successful', user: @test_user)
-    # @digital_object_import1 = DigitalObjectImport.new(id: 77, import_job: @test_import_job)
-    # @digital_object_import1.success!
-    # puts @digital_object_import1.changed?
-    # @digital_object_import1.digital_object_data = 'Blah!'
-    # puts @digital_object_import1.changed?
+    @test_user = User.create!(id: 1966, name:'Test User')
+    @test_import_job = ImportJob.create!(id: 1966, name: 'Test Import Job', user: @test_user)
+    @test_digital_object_import_1 = DigitalObjectImport.create!(id: 1966, import_job: @test_import_job)
+    @test_digital_object_import_2 = DigitalObjectImport.create!(id: 1967, import_job: @test_import_job)
+    @test_digital_object_import_3 = DigitalObjectImport.create!(id: 1968, import_job: @test_import_job)
 
-    # @digital_object_import2 = DigitalObjectImport.new(id: 78, import_job: @test_import_job)
-    # @digital_object_import2.digital_object_data = 'Blah!'
-    # @digital_object_import2.save!
+  end
 
-    # @digital_object_import1.reload
-    # puts @digital_object_import1.status
+  after(:context) do
 
-    # @digital_object_import1.failure!
-    # puts @digital_object_import1.status
-    
-    # @digital_object_import1.reload
-    # puts @digital_object_import1.status
+    @test_user.destroy
+    @test_import_job.destroy
+    @test_digital_object_import_1.destroy
+    @test_digital_object_import_2.destroy
+    @test_digital_object_import_3.destroy
 
-    # @test_import_job.destroy
-    # @digital_object_import1.destroy
+      
+  end
+
+  before(:example) do
+
+    @test_import_job.digital_object_imports.each do |import|
+
+      import.pending!
+
+    end
+
+  end
+
+  context "test has_many DigitalObjectImport association" do
+
+    it "dependent: :destroy modifier on has_many association with DigitalObjectImport" do
+
+      association = ImportJob.reflect_on_association(:digital_object_imports)
+      expect(association.options[:dependent]).to eq(:destroy)
+      
+    end
 
   end
 
   context "#new:" do
 
-    it "instance is invalid if required name arg is not given" do
+    it "value of belongs_to User matches name of User instance passed at creation" do
 
-      test_user = User.new(id: test_id)
-      new_import_job = ImportJob.new(id: test_id, user: test_user)
-      expect(new_import_job.valid?).to eq(false)
+      local_user = @test_import_job.user
+      expect(local_user.name).to eq(@test_user.name)
 
     end
 
     it "instance is valid if required name arg is given" do
 
-      test_user = User.new(id: test_id)
-      new_import_job = ImportJob.new(id: test_id, name: 'First Job', user: test_user)
-      expect(new_import_job.valid?).to eq(true)
+      new_import_job = ImportJob.new(id: 1967, name: 'New Import Job', user: @test_user)
+      expect(new_import_job.valid?).to eq(false)
+
+    end
+
+    it "instance is invalid if required name arg is missing" do
+
+      new_import_job = ImportJob.new(id: 1968, user: @test_user)
+      expect(new_import_job.invalid?).to eq(true)
+
+    end
+
+    it "instance is invalid if required User arg is missing" do
+
+      new_import_job = ImportJob.new(id: 1969, name: 'New Import Job')
+      expect(new_import_job.invalid?).to eq(false)
+
+    end
+
+    it "instance has 3 DigitalObjectImports instances associated with it" do
+
+      num_of_digital_object_import = @test_import_job.digital_object_imports.size
+      expect(num_of_digital_object_import).to eq(3)
+
+    end
+
+    it "instance can access all 3 DigitalObjectImports instances associated with it at their creation" do
+
+      digital_object_imports = DigitalObjectImport.where(import_job: @test_import_job)
+      expect(digital_object_imports).to eq(@test_import_job.digital_object_imports.all)
 
     end
 
   end  
 
-  context "#success?:" do
+  context "#success?: " do
 
-    it "returns true if all imports for the job were successful" do
+    it "returns false for the newly created ImportJob containing 3 DigitalObjectImports" do
 
-      test_user = User.new(id: test_id)
-      test_import_job = ImportJob.create(id: test_id, name: 'All Jobs Successful', user: test_user)
-      digital_object_import1 = DigitalObjectImport.new(import_job: test_import_job)
+      expect(@test_import_job.success?).to eq(false)
 
-      # puts 'Here is digital_object_import1 before call to success!:' + digital_object_import1.inspect
+    end
+ 
+    it "returns true if all DigitalObjectimports belonging to it were successful" do
 
-      digital_object_import1.success!
-      
-      # puts 'Here is digital_object_import1 after call to success!:' + digital_object_import1.inspect
+      @test_import_job.digital_object_imports.each do |digital_object_import|
 
-      # puts digital_object_import1.save!
+        digital_object_import.success!
+        
+      end
 
-      digital_object_import1.reload
-      
-      # puts 'Here is digital_object_import1 after reload:' + digital_object_import1.inspect
-
-      digital_object_import2 = DigitalObjectImport.create!(import_job: test_import_job)
-
-      digital_object_import2.success!
-
-      # puts digital_object_import2.save!
-
-      digital_object_import2.reload
-      
-      # puts digital_object_import2.inspect
-
-      expect(test_import_job.success?).to eq(true)
+      expect(@test_import_job.success?).to eq(true)
 
     end
 
-    it "returns false if some imports for the job were not successful: one failure" do
+    it "returns false if all imports for the job were successful expect one (a failure)" do
 
-      test_user = User.new(id: test_id)
-      test_import_job = ImportJob.create(id: test_id, name: 'All Jobs Successful', user: test_user)
-      digital_object_import1 = DigitalObjectImport.new(import_job: test_import_job)
+      @test_import_job.digital_object_imports.each do |digital_object_import|
 
-      # puts 'Here is digital_object_import1 before call to success!:' + digital_object_import1.inspect
+        digital_object_import.success!
+        
+      end
 
-      digital_object_import1.success!
+      # change the first on to a failure
+      @test_import_job.digital_object_imports.first.failure!
+
+      expect(@test_import_job.success?).to eq(false)
       
-      # puts 'Here is digital_object_import1 after call to success!:' + digital_object_import1.inspect
-
-      # puts digital_object_import1.save!
-
-      digital_object_import1.reload
-      
-      # puts 'Here is digital_object_import1 after reload:' + digital_object_import1.inspect
-
-      digital_object_import2 = DigitalObjectImport.create!(import_job: test_import_job)
-
-      digital_object_import2.failure!
-
-      # puts digital_object_import2.save!
-
-      digital_object_import2.reload
-      
-      # puts digital_object_import2.inspect
-
-      expect(test_import_job.success?).to eq(false)
-
     end
 
-    it "returns false if some imports for the job were not successful: one pending" do
+  end
 
-      test_user = User.new(id: test_id)
-      test_import_job = ImportJob.create(id: test_id, name: 'All Jobs Successful', user: test_user)
-      digital_object_import1 = DigitalObjectImport.new(import_job: test_import_job)
+  context "#return_pending_digital_object_imports" do
 
-      # puts 'Here is digital_object_import1 before call to success!:' + digital_object_import1.inspect
+    it "one failure: returns the correct instance of DigitalObjectImport" do
 
-      digital_object_import1.success!
-      
-      # puts 'Here is digital_object_import1 after call to success!:' + digital_object_import1.inspect
-
-      # puts digital_object_import1.save!
-
-      digital_object_import1.reload
-      
-      # puts 'Here is digital_object_import1 after reload:' + digital_object_import1.inspect
-
-      digital_object_import2 = DigitalObjectImport.create!(import_job: test_import_job)
-
-      digital_object_import2.reload
-      
-      # puts digital_object_import2.inspect
-
-      expect(test_import_job.success?).to eq(false)
+      @test_import_job.digital_object_imports.second.failure!
+      expect(@test_import_job.return_pending_digital_object_imports).to eq([@test_import_job.digital_object_imports.first,
+                                                                           @test_import_job.digital_object_imports.last])
 
     end
 
   end
 
-  context "test ImportJob with mutliple dependent DigitalObjectModel:" do
+  context "#return_success_digital_object_imports" do
 
-    it "one ImportJob with two DigitalObjectImport instance" do
+    it "one failure: returns the correct instance of DigitalObjectImport" do
 
-      test_user = User.create(id: test_id)
-      test_import_job = ImportJob.create(id: test_id, name: 'All Jobs Successful', user: test_user)
-      digital_object_import1 = DigitalObjectImport.create(id: test_id,import_job: test_import_job,
-                                                          digital_object_data: 'Foo')
-      digital_object_import2 = DigitalObjectImport.create(id: test_id_2,import_job: test_import_job,
-                                                          digital_object_data: 'Moo')
-
-      test_import_job.digital_object_import.all.where(digital_object_data: 'Moo').each do |import|
-
-        puts import.inspect
-
-      end
+      @test_import_job.digital_object_imports.second.success!
+      expect(@test_import_job.return_successful_digital_object_imports).to eq([@test_import_job.digital_object_imports.second])
 
     end
 
   end
 
-  xcontext "test destruction of dependent DigitalObjectModel:" do
+  context "#return_failed_digital_object_imports" do
 
-    xcontext "Sanity check: depedent DigitalObjectModel exist and can be retrieved via ImportJob" do
+    it "one failure: returns the correct instance of DigitalObjectImport" do
 
-      test_user = User.create(id: test_id)
-      test_import_job = ImportJob.create(id: test_id, name: 'All Jobs Successful', user: test_user)
-      digital_object_import1 = DigitalObjectImport.create(import_job: test_import_job)
-      digital_object_import1 = DigitalObjectImport.create(import_job: test_import_job)
-
-      it "sanity check: depedent DigitalObjectModel exist and can be retrieved via ImportJob" do
-
-      end
+      @test_import_job.digital_object_imports.second.failure!
+      expect(@test_import_job.return_failed_digital_object_imports).to eq([@test_import_job.digital_object_imports.second])
 
     end
 

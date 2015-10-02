@@ -4,127 +4,111 @@ RSpec.describe DigitalObjectImport, :type => :model do
 
   before(:context) do
 
-    puts "resettting stuff"
-    # new_import_job = ImportJob.create
-    #@new_import_job = ImportJob.new(name: "New Job")
-    #@new_digital_object_import = DigitalObjectImport.new(import_job: @new_import_job)
-    # @new_digital_object_import = DigitalObjectImport.new(import_job: @new_import_job, status: 0)
-    # @new_digital_object_import.pending!
-    # @new_import_job.save!
-    # @new_digital_object_import.save!
+    @test_user = User.create!(id: 1966, name:'Test User')
+    @test_import_job = ImportJob.create!(id: 1966, name: 'Test Import Job', user: @test_user)
+    @test_digital_object_import = DigitalObjectImport.create!(id: 1966, import_job: @test_import_job)
 
   end
 
   after(:context) do
 
-    # ImportJob.delete(@new_import_job.id)
-    # DigitalObjectImport.delete(@new_digital_object_import.id)
+    @test_user.destroy
+    @test_import_job.destroy
+    @test_digital_object_import.destroy
       
   end
 
-  xcontext "#new:" do
+  context "#new: " do
 
-    xit "instance is invalid if required ImportJob arg is not given" do
-
-      # new_digital_import_object = DigitalObjectImport.new
-      # new_import_job.save!
-      # expect(new_import_job.valid?).to eq(false)
-      @bad_object = DigitalObjectImport.new
-      expect(DigitalObjectImport.new).to raise_error
+    it "name of belongs_to ImportJob matches name of ImportJob instance passed at creation" do
+    
+  
+      local_import_job = @test_digital_object_import.import_job
+      expect(local_import_job.name).to eq(@test_import_job.name)
 
     end
 
-    it "instance is valid if required name arg is given" do
-      
-      new_import_job = ImportJob.new(name: "New Job")
-      new_digital_object_import = DigitalObjectImport.new(import_job: new_import_job)
+    it "the status of a newly created instance is pending" do
 
-      expect(new_import_job.valid?).to eq(true)
+      expect(@test_digital_object_import.pending?).to eq(true)
 
     end
-
+    
   end  
 
-  xcontext "Newly created instance has the correct default values:" do
+  context "after call to #success! :" do
 
-    it "the status of a newly created should be pending" do
+    it "#success? returns true" do
 
-      new_import_job = ImportJob.new(name: "New Job")
-      new_digital_object_import = DigitalObjectImport.new(import_job: new_import_job)
-
-      # @new_digital_object_import.reload
-      expect(new_digital_object_import.pending?).to eq(true)
+      @test_digital_object_import.success!
+      expect(@test_digital_object_import.success?).to eq(true)
 
     end
-    
+
+    it "#pending? returns false" do
+
+      @test_digital_object_import.success!
+      expect(@test_digital_object_import.pending?).to eq(false)
+
+    end
+
+    it "#failure? returns false" do
+
+      @test_digital_object_import.success!
+      expect(@test_digital_object_import.failure?).to eq(false)
+
+    end
+
   end
 
-  xcontext "Changing status of newly created instance:" do
+  context "after call to #failure! :" do
 
-    it "call to #success! changes status to success" do
+    it "#success? returns false" do
 
-      # puts @new_digital_object_import.inspect
-
-      puts @new_digital_object_import.inspect
-
-      @new_digital_object_import.success!
-      @new_digital_object_import.save!
-      @new_digital_object_import.reload
-
-      puts @new_digital_object_import.inspect
-
-      expect(@new_digital_object_import.success?).to eq(true)
+      @test_digital_object_import.failure!
+      expect(@test_digital_object_import.failure?).to eq(true)
 
     end
 
-    it "call to #pending? now return false" do
+    it "#pending? returns false" do
 
-      puts @new_digital_object_import.inspect
-      puts "Changed? #{@new_digital_object_import.changed?}"
-      @new_digital_object_import.save!
-      puts @new_digital_object_import.inspect
-      @new_digital_object_import.reload
-      @new_digital_object_import.reload
-      puts @new_digital_object_import.inspect
-      expect(@new_digital_object_import.pending?).to eq(false)
+      @test_digital_object_import.failure!
+      expect(@test_digital_object_import.pending?).to eq(false)
 
     end
-    
+
+    it "#success? returns false" do
+
+      @test_digital_object_import.failure!
+      expect(@test_digital_object_import.success?).to eq(false)
+
+    end
+
   end
 
-  context "Testing stuff" do
+  context "after call to #pending! :" do
 
-    it "Testing stuff" do
+    it "#pending? returns true" do
 
-      new_import_job = ImportJob.new(name: "New Job")
-      new_digital_object_import = DigitalObjectImport.new(import_job: new_import_job)
-
-      puts "Changed? #{new_digital_object_import.changed?}"
-      puts new_digital_object_import.inspect
-      new_digital_object_import.success!
-      puts "Changed? #{new_digital_object_import.changed?}"
-      puts new_digital_object_import.inspect
-      new_digital_object_import.status = 'failure'
-      puts "Changed? #{new_digital_object_import.changed?}"
-      puts new_digital_object_import.inspect
-      new_digital_object_import.digital_object_data = 'Hi Fred'
-      puts "Changed? #{new_digital_object_import.changed?}"
-      puts new_digital_object_import.inspect
-      new_digital_object_import.pending!
-      puts "Changed? #{new_digital_object_import.changed?}"
-      puts new_digital_object_import.inspect
-      new_digital_object_import.save!
-      new_digital_object_import.reload
-      puts new_digital_object_import.inspect
-      new_digital_object_import.save!
-      puts new_digital_object_import.inspect
-      new_digital_object_import.reload
-      new_digital_object_import.reload
-      puts new_digital_object_import.inspect
-      expect(new_digital_object_import.pending?).to eq(false)
+      @test_digital_object_import.pending!
+      expect(@test_digital_object_import.pending?).to eq(true)
 
     end
-    
+
+    it "#success? returns false" do
+
+      @test_digital_object_import.pending!
+      expect(@test_digital_object_import.success?).to eq(false)
+
+    end
+
+    it "#failure? returns false" do
+
+      @test_digital_object_import.pending!
+      expect(@test_digital_object_import.failure?).to eq(false)
+
+    end
+
   end
 
 end
