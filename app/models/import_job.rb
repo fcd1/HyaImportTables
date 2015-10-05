@@ -1,5 +1,6 @@
 class ImportJob < ActiveRecord::Base
 
+  # the name attribute will be the csv filename, and thus may not be unique
   validates :name, presence: true
   has_many :digital_object_imports, dependent: :destroy
   belongs_to :user, required: true
