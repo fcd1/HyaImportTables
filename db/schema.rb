@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150917193355) do
+ActiveRecord::Schema.define(version: 20150917193337) do
 
   create_table "digital_object_imports", force: :cascade do |t|
     t.text     "digital_object_data", limit: 65535
@@ -36,4 +36,6 @@ ActiveRecord::Schema.define(version: 20150917193355) do
     t.string "name", limit: 255, null: false
   end
 
+  add_foreign_key "digital_object_imports", "import_jobs"
+  add_foreign_key "import_jobs", "users"
 end

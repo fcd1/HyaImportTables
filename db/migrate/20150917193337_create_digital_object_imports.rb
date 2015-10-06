@@ -6,7 +6,7 @@ class CreateDigitalObjectImports < ActiveRecord::Migration
 
       t.text :digital_object_data
       t.integer :status, null: false
-      t.references :import_job, null: false, index: true
+      t.references :import_job, null: false, index: true, foreign_key: true
 
       t.timestamps null: false
 
