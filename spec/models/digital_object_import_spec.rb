@@ -12,9 +12,10 @@ RSpec.describe DigitalObjectImport, :type => :model do
 
   after(:context) do
 
-    @test_user.destroy
-    @test_import_job.destroy
     @test_digital_object_import.destroy
+    @test_import_job.destroy
+    @test_user.destroy
+
       
   end
 

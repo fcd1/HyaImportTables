@@ -17,11 +17,11 @@ RSpec.describe ImportJob, :type => :model do
 
   after(:context) do
 
-    @test_user.destroy
-    @test_import_job.destroy
     @test_digital_object_import_1.destroy
     @test_digital_object_import_2.destroy
     @test_digital_object_import_3.destroy
+    @test_import_job.destroy
+    @test_user.destroy
 
       
   end
@@ -59,7 +59,7 @@ RSpec.describe ImportJob, :type => :model do
     it "instance is valid if required name arg is given" do
 
       new_import_job = ImportJob.new(id: 1967, name: 'New Import Job', user: @test_user)
-      expect(new_import_job.valid?).to eq(false)
+      expect(new_import_job.valid?).to eq(true)
 
     end
 
@@ -73,7 +73,7 @@ RSpec.describe ImportJob, :type => :model do
     it "instance is invalid if required User arg is missing" do
 
       new_import_job = ImportJob.new(id: 1969, name: 'New Import Job')
-      expect(new_import_job.invalid?).to eq(false)
+      expect(new_import_job.invalid?).to eq(true)
 
     end
 
